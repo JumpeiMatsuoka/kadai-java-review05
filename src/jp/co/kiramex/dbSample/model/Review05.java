@@ -15,55 +15,35 @@ public class Review05 {
         // TODO 自動生成されたメソッド・スタブ
         Connection con = null;
         PreparedStatement spstmt = null;
-        PreparedStatement ipstmt = null;
         ResultSet rs = null;
 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection("jdbc:mysql://localhost/kadaidb?useSSL=false&allowPublicKeyRetrieval=true",
-                    "root", "Uesugiyozan84");
+            "root", "Uesugiyozan84");
 
-            String selectSql = "SELECT * FROM person where id = ?";
-            spstmt = con.prepareStatement(selectSql);
+            String sql = "SELECT * FROM person where id = ?";
+            spstmt = con.prepareStatement(sql);
 
             System.out.print("検索キーワードを入力してください > ");
             String str1 = keyIn();
+            int id = Integer.parseInt(str1);
 
-            spstmt.setString(1, str1);
-
+            spstmt.setInt(1,id);
             rs = spstmt.executeQuery();
 
-            System.out.println("更新前===================");
-
             while (rs.next()) {
-                // Name列の値を取得
-                int id = rs.getInt("Id");
-                // 取得した値を表示
-                String name = rs.getString("Name");
+                String name = rs.getString("name");
+                int age = rs.getInt("age");
 
-                System.out.println("更新処理実行=============");
-
-                // 更新用SQLおよび更新用PreparedStatementオブジェクトを取得
-                String insertSql = "INSERT INTO person (Name,Id) VALUES ('Rafah',?,'Rafah',?)";
-                ipstmt = con.prepareStatement(insertSql);
-
-                System.out.print("idを数字で入力してください > ");
-                int num1 = keyInNum();
-                ipstmt.setString(1, str1);
-                ipstmt.setInt(2, num1);
-
-                int count = ipstmt.executeUpdate();
-                System.out.println("更新行数：" + count);
-                rs.close();// 更新後の検索のため、一旦閉じる（閉じないと警告が出るため）
-                System.out.println("更新後=================");
-                // 検索の再実行と結果を格納／代入
-                rs = spstmt.executeQuery();
-
+                System.out.println(name);
+                System.out.println(age);
             }
         } catch (ClassNotFoundException e) {
             // TODO 自動生成された catch ブロック
             System.err.println("JDBCドライバのロードに失敗しました。");
             e.printStackTrace();
+
         } catch (SQLException e) {
             // TODO 自動生成された catch ブロック
             System.err.println("データベースに異常が発生しました。");
@@ -78,7 +58,7 @@ public class Review05 {
                     e.printStackTrace();
                 }
             }
-            if (ipstmt != null) { // ← 修正
+            if (spstmt != null) { // ← 修正
                 try {
                     spstmt.close(); // ← 修正
                 } catch (SQLException e) {
@@ -107,12 +87,4 @@ public class Review05 {
         return line;
     }
 
-    private static int keyInNum() {
-        int result = 0;
-        try {
-            result = Integer.parseInt(keyIn());
-        } catch (NumberFormatException e) {
-        }
-        return result;
-    }
 }
